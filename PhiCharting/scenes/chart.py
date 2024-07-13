@@ -7,7 +7,6 @@ from PhiCharting import phigros as phi
 from .chart_view import ChartView
 
 import json
-import time
 
 class Chart(Scene):
     def __init__(self, song: Song):
@@ -41,10 +40,10 @@ class Chart(Scene):
         self.view_window.flip()
 
         Super(sc)
-        for i, line in enumerate(self.chart_view.chart_render.chart.lines):
-            y = 100 * i + 50
-            sc.blit(text(f"Line #{i}: \"{line.name}\"", 24, (255, 255,255)), (50, y))
-            sc.blit(text(f"X: {round(line.x, 5)}, Y: {round(line.y, 5)}. Rot: {round(line.rotation, 5)}, A: {round(line.alpha, 5)}, S: {round(line.speed, 5)}", 20, (255, 255, 255)), (50, y + 30))
+        #for i, line in enumerate(self.chart_view.chart_render.chart.lines):
+        #    y = 100 * i + 50
+        #    sc.blit(text(f"Line #{i}: \"{line.name}\"", 24, (255, 255,255)), (50, y))
+        #    sc.blit(text(f"X: {round(line.x, 5)}, Y: {round(line.y, 5)}. Rot: {round(line.rotation, 5)}, A: {round(line.alpha, 5)}, S: {round(line.speed, 5)}", 20, (255, 255, 255)), (50, y + 30))
 
     def event(self, ev: pg.Event):
         if not Super(ev): return

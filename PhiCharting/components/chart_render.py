@@ -103,11 +103,19 @@ class ChartRender(Component):
             if speed := self.process_event(layer.speed, dt):
                 layer.curr_speed = speed
 
-        line.x = sum(layer.curr_x for layer in line.events)
-        line.y = sum(layer.curr_y for layer in line.events)
-        line.alpha = max(min(255, sum(layer.curr_alpha for layer in line.events)), 0)
-        line.rotation = sum(layer.curr_rotate for layer in line.events)
-        line.speed = sum(layer.curr_speed for layer in line.events)
+        x = y = alpha = rotation = speed = 0
+        for layer in line.events:
+            x += layer.curr_x
+            y += layer.curr_y
+            alpha += layer.curr_alpha
+            rotation += layer.curr_rotate
+            speed += layer.curr_speed
+
+        line.x = x
+        line.y = y
+        line.alpha = max(min(255, alpha), 0)
+        line.rotation = rotation
+        line.speed = speed
 
         if line.texture not in self.texture_cache:
             try:
