@@ -18,6 +18,7 @@ class Song:
     path: str
     song_path: str
     thumbnail_path: str
+    chart_path: str
 
 class SongList(Component, Tooltipped):
     # noinspection PyTypeChecker
@@ -34,7 +35,8 @@ class SongList(Component, Tooltipped):
                 with open("charts/" + dir + "/info.json5") as f:
                     info = json5.loads(f.read())
                     self.songs.append(Song(info["name"], info["composer"], info["level"], info["charter"], "charts/" + dir,
-                                           "charts/" + dir + "/" + info["song"], "charts/" + dir + "/" + info["thumbnail"]))
+                                           "charts/" + dir + "/" + info["song"], "charts/" + dir + "/" + info["thumbnail"],
+                                           "charts/" + dir + "/" + info["chart"]))
             except FileNotFoundError:
                 messagebox.showerror("Cannot Load Metadata", f"Cannot load metadata for {dir} because 'info.json5' is not found.\n\nSkipping.")
 
@@ -85,8 +87,11 @@ class SongList(Component, Tooltipped):
         blur = pg.transform.gaussian_blur(self.song_thumbnail, 10)
         self.song_thumbnail_blur_400x400 = pg.transform.smoothscale(blur, (400, 400))
         self.song_thumbnail_blur_400x400.set_alpha(100)
-        self.song_thumbnail_blur = pg.transform.smoothscale_by(blur, Config.instance().get("screen_size")[0] / blur.get_width())
-        self.song_thumbnail_blur.set_alpha(127)
+        tn_aspect = blur.get_width() / blur.get_height()
+        if tn_aspect > Config.instance().get("screen_size")[0] / Config.instance().get("screen_size")[1]:
+            self.song_thumbnail_blur = pg.transform.smoothscale(blur, Config.instance().get("screen_size"))
+        else:
+            self.song_thumbnail_blur = pg.transform.smoothscale_by(blur, Config.instance().get("screen_size")[0] / blur.get_width())
         pg.mixer.music.load(self.songs[song_id].song_path)
         pg.mixer.music.rewind()
         pg.mixer.music.play()
@@ -99,7 +104,7 @@ class SongList(Component, Tooltipped):
         self.select_song(id)
 
     def event(self, ev: pg.Event):
-        if not super().event(ev):
+        if not Super(ev):
             return
 
         if ev.type == pg.MOUSEWHEEL and self.rect.collidepoint(pg.mouse.get_pos()):

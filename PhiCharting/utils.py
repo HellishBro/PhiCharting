@@ -2,8 +2,21 @@ from os import path
 import pygame as pg
 from typing import Union
 from tkinter import messagebox
+import inspect
 
-__all__ = ["asset", "to_blit_center", "Vec", "text", "load_img", "scale", "fit"]
+__all__ = ["asset", "to_blit_center", "Vec", "text", "load_img", "scale", "fit", "Super", "center_coord"]
+
+def Super(*args, **kwargs):
+    frame = inspect.currentframe().f_back
+    meth_name = frame.f_code.co_name
+    super_meth = getattr(super(frame.f_locals["self"].__class__, frame.f_locals["self"]), meth_name)
+    return super_meth(*args, **kwargs)
+
+def center_coord(position: tuple, size: tuple) -> tuple:
+    """
+    Get the top-left corner of a rectangle whose center is `position` with size `size`
+    """
+    return position[0] - size[0] / 2, position[1] - size[1] / 2
 
 def asset(filename: str) -> str:
     return "assets/" + filename

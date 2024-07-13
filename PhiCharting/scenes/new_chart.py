@@ -5,6 +5,8 @@ from PhiCharting.components import *
 from PhiCharting.utils import *
 from PhiCharting.config import Config
 
+from PhiCharting import phigros as phi
+
 from pathlib import Path
 from tkinter import messagebox
 from os import path
@@ -15,9 +17,9 @@ class NewChart(Scene):
     # noinspection PyTypeChecker
     def __init__(self):
         super().__init__()
-        self.back_button = Button(
+        self.back_button = self.add_component(Button(
             (30, 30), (150, 100),
-            text("Back", 40, (255, 255, 255)), "Go back to title", self.go_back).set_scene(self)
+            text("Back", 40, (255, 255, 255)), "Go back to title", self.go_back))
 
         self.page = 0
 
@@ -25,8 +27,8 @@ class NewChart(Scene):
         self.current_screen = Text((0, 0), "Asset Information", 50, (255, 255, 255))
         self.current_screen.position = (screen_width - self.current_screen.size[0] - 50, 30)
 
-        self.next_screen = Button((screen_width - 250, screen_height - 125), (200, 75), text("Next", 30, (255, 255, 255)), "Go to next page", self.next_page).set_scene(self)
-        self.prev_screen = Button((screen_width - 450, screen_height - 125), (200, 75), text("Previous", 30, (255, 255, 255)), "Go to previous page", self.prev_page).set_scene(self)
+        self.next_screen = self.add_component(Button((screen_width - 250, screen_height - 125), (200, 75), text("Next", 30, (255, 255, 255)), "Go to next page", self.next_page))
+        self.prev_screen = self.add_component(Button((screen_width - 450, screen_height - 125), (200, 75), text("Previous", 30, (255, 255, 255)), "Go to previous page", self.prev_page))
         self.prev_screen.disable = True
 
         # Asset Information
@@ -54,8 +56,11 @@ class NewChart(Scene):
         self.composer_text = Text((30, 340), "Composer:", 40, (200, 200, 200))
         self.composer = TextInput((300, 340), (screen_width - 350, 50), 20, placeholder="Composer")
 
-        self.charter_text = Text((30, 410), "Charter:", 40, (200, 200, 200))
-        self.charter = TextInput((300, 410), (screen_width - 350, 50), 20, placeholder="Charter")
+        self.thumbnail_artist_text = Text((30, 410), "Illustrator:", 40, (200, 200, 200))
+        self.thumbnail_artist = TextInput((300, 410), (screen_width - 350, 50), 20, placeholder="Unknown")
+
+        self.charter_text = Text((30, 480), "Charter:", 40, (200, 200, 200))
+        self.charter = TextInput((300, 480), (screen_width - 350, 50), 20, placeholder="Charter")
 
         # Starting Information
 
@@ -80,6 +85,7 @@ class NewChart(Scene):
                 self.chart_name_text, self.chart_name, self.chart_save_text, self.chart_save,
                 self.difficulty_text, self.difficulty,
                 self.composer_text, self.composer,
+                self.thumbnail_artist_text, self.thumbnail_artist,
                 self.charter_text, self.charter
             ],
             [
@@ -95,7 +101,7 @@ class NewChart(Scene):
                 self.audio_track, self.thumbnail
             ],
             [
-                self.chart_name, self.chart_save, self.difficulty, self.composer, self.charter
+                self.chart_name, self.chart_save, self.difficulty, self.composer, self.thumbnail_artist, self.charter
             ],
             [
                 self.default_speed, self.default_bpm, self.line_amount
@@ -123,98 +129,26 @@ class NewChart(Scene):
                 "thumbnail": thumbnail_path,
                 "level": self.difficulty.value,
                 "composer": self.composer.value,
-                "charter": self.charter.value
+                "charter": self.charter.value,
+                "illustrator": self.thumbnail_artist.value,
+                "ratio": [16, 9]
             }, indent=4))
 
         shutil.copy2(self.audio_track.file_path, directory / song_path)
         shutil.copy2(self.thumbnail.file_path, directory / thumbnail_path)
 
-        chart_data = {
-            "BPMList": [{
-                "bpm": float(self.default_bpm.value) if "." in self.default_bpm.value else int(self.default_bpm.value),
-                "startTime": [0, 0, 1]
-            }],
-            "META": {
-                "program": "phiCharting",
-                "offset": 0
-            },
-            "judgeLineList": [{
-                "Name": f"Unnamed {i}",
-                "Texture": "line.png",
-                "father": -1, # lines are fatherless confirmed by Re:PhiEditor
-                "eventLayers": [{
-                    "alphaEvents": [{
-                        "bezier": 0,
-                        "bezierPoints": [0, 0, 0, 0],
-                        "easingLeft": 0,
-                        "easingRight": 1,
-                        "easingType": 1,
-                        "end": 0,
-                        "endTime": [1, 0, 1],
-                        "linkgroup": 0,
-                        "start": 255 if i == 0 else 0,
-                        "startTime": [0, 0, 1]
-                    }],
-                    "moveXEvents": [{
-                        "bezier": 0,
-                        "bezierPoints": [0, 0, 0, 0],
-                        "easingLeft": 0,
-                        "easingRight": 1,
-                        "easingType": 1,
-                        "end": 0,
-                        "endTime": [1, 0, 1],
-                        "linkgroup": 0,
-                        "start": 0,
-                        "startTime": [0, 0, 1]
-                    }],
-                    "moveYEvents": [{
-                        "bezier": 0,
-                        "bezierPoints": [0, 0, 0, 0],
-                        "easingLeft": 0,
-                        "easingRight": 1,
-                        "easingType": 1,
-                        "end": 0,
-                        "endTime": [1, 0, 1],
-                        "linkgroup": 0,
-                        "start": 0,
-                        "startTime": [0, 0, 1]
-                    }],
-                    "rotateEvents": [{
-                        "bezier": 0,
-                        "bezierPoints": [0, 0, 0, 0],
-                        "easingLeft": 0,
-                        "easingRight": 1,
-                        "easingType": 1,
-                        "end": 0,
-                        "endTime": [1, 0, 1],
-                        "linkgroup": 0,
-                        "start": 0,
-                        "startTime": [0, 0, 1]
-                    }],
-                    "speedEvents": [{
-                        "end": float(self.default_speed.value),
-                        "endTime": [1, 0, 1],
-                        "linkgroup": 0,
-                        "start": float(self.default_speed.value),
-                        "startTime": [0, 0, 1]
-                    }]
-                }],
-                "extended": {},
-                "notes": [],
-                "isCover": 1,
-                "zOrder": 0,
-                "posControl": [],
-                "sizeControl": [],
-                "alphaControl": [],
-                "yControl": []
-            } for i in range(int(self.line_amount.value))]
-        }
+        lines = [phi.Line([], f"Unnamed {i}", events=[
+            phi.EventLayer([], [],
+                           [phi.Event(1, 0, 255, (0, 0, 1), (1, 0, 1))]
+                           if i == 0 else [], [], [])
+        ]) for i in range(int(self.line_amount.value))]
 
         with open(directory / "chart.json", "w") as f:
-            f.write(json.dumps(chart_data, indent=4))
+            f.write(json.dumps(phi.Chart([phi.BPMTiming((0, 0, 1), float(self.default_bpm.value))], lines).to_json(
+                defaultSpeed=float(self.default_bpm.value)
+            ), indent=4))
 
         messagebox.showinfo("Chart Creation Done!", f"Chart files for {self.chart_name.value} is now created!")
-
         self.switch_scene = "Title"
 
     def next_page(self, b: Button):
@@ -306,19 +240,15 @@ class NewChart(Scene):
         self.switch_scene = 'Title'
 
     def update(self, dt: float):
-        self.back_button.update(dt)
+        Super(dt)
 
         for item in self.pages[self.page]:
             if item:
                 item.update(dt)
 
-        self.next_screen.update(dt)
-        self.prev_screen.update(dt)
-
     def draw(self, sc: pg.Surface):
         if self.thumbnail_blur:
             sc.blit(self.thumbnail_blur, (0, 0))
-        self.back_button.draw(sc)
         self.current_screen.draw(sc)
 
         for item in self.pages[self.page]:
@@ -328,19 +258,14 @@ class NewChart(Scene):
         if self.thumbnail_image and self.page == 1:
             sc.blit(self.thumbnail_image, (250, 320))
 
-        self.next_screen.draw(sc)
-        self.prev_screen.draw(sc)
+        Super(sc)
 
     def event(self, ev: pg.Event):
-        super().event(ev)
-        self.back_button.event(ev)
+        Super(ev)
 
         for item in self.pages[self.page]:
             if item:
                 item.event(ev)
-
-        self.next_screen.event(ev)
-        self.prev_screen.event(ev)
 
     def click(self, ev: pg.Event, pos: tuple):
         pass

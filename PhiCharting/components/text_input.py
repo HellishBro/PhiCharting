@@ -1,7 +1,6 @@
 import pygame as pg
 from .base import Component
 from PhiCharting.utils import *
-import pyperclip
 from typing import Callable
 
 class TextInput(Component):
@@ -224,22 +223,22 @@ class TextInput(Component):
                 self.unfocus()
 
             if ev.key == pg.K_c and ctrl:
-                pyperclip.copy(self.value[select_start:select_end])
+                pg.scrap.put_text(self.value[select_start:select_end])
             elif ev.key == pg.K_v and ctrl:
-                if not all(self.allowed_characters(c, self.value, self.value + pyperclip.paste()) for c in pyperclip.paste()):
+                if not all(self.allowed_characters(c, self.value, self.value + pg.scrap.get_text()) for c in pg.scrap.get_text()):
                     return
 
                 if self.selecting:
                     self.selecting = False
-                    self.value = self.value[:select_start] + pyperclip.paste() + self.value[select_end:]
-                    self.cursor_index = select_end + len(pyperclip.paste())
+                    self.value = self.value[:select_start] + pg.scrap.get_text() + self.value[select_end:]
+                    self.cursor_index = select_end + len(pg.scrap.get_text())
                     self.cursor_index = min(self.cursor_index, len(self.value))
                 else:
-                    self.value = self.value[:self.cursor_index] + pyperclip.paste() + self.value[self.cursor_index:]
-                    self.cursor_index += len(pyperclip.paste())
+                    self.value = self.value[:self.cursor_index] + pg.scrap.get_text() + self.value[self.cursor_index:]
+                    self.cursor_index += len(pg.scrap.get_text())
                     self.cursor_index = min(self.cursor_index, len(self.value))
             elif ev.key == pg.K_x and ctrl:
-                pyperclip.copy(self.value[select_start:select_end])
+                pg.scrap.put_text(self.value[select_start:select_end])
                 self.value = self.value[:select_start] + self.value[select_end:]
                 self.cursor_index = select_start
             elif ev.key == pg.K_a and ctrl:
