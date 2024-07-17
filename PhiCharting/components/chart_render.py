@@ -70,24 +70,20 @@ class ChartRender(Component):
         # unit = base_units * note_speed * line_speed * 120?
         time_diff = self.time_from_beats(note.time) - self.time
         effective_speed = note.speed * line.speed
-        units = time_diff * self.unit_y * effective_speed * 120 * (note.above * 2 - 1)
+        units = time_diff * self.unit_y * effective_speed * 120 * (note.downscroll * 2 - 1)
 
         pos = self.pos_relative_to_line((note.x, units), line)
+        if (abs(pos[0]) > 680 or abs(pos[1]) > 455) and note.type != 2:
+            return
         world = self.coord_from_unit(*pos)
         image = self.note_images[note.type]
         if note.type == 2: # hold note
-            hold_length = abs((self.time_from_beats(note.end_time) - self.time_from_beats(note.time)) * self.unit_y * effective_speed * 120)
+            hold_length = abs((self.time_from_beats(note.end_time) - self.time_from_beats(note.time)) * self.unit_y * effective_speed * 120) * (note.downscroll * 2 - 1)
             image = pg.transform.scale(image, (image.get_width(), hold_length))
             pos = self.pos_relative_to_line((note.x, units + hold_length), line)
             world = self.coord_from_unit(*pos)
-        image = pg.transform.rotate(image, -line.rotation + 180 * (not note.above))
+        image = pg.transform.rotate(image, -line.rotation + 180 * (not note.downscroll))
         sc.blit(image, world)
-
-    def get_visible_notes(self, line: phi.Line) -> list[phi.Note]:
-        return filter(
-            lambda note: self.time <= self.time_from_beats(note.time) or self.time <= self.time_from_beats(note.end_time),
-            line.notes
-        )
 
     def update_line(self, id: int, dt: float):
         line = self.chart.lines[id]
@@ -180,7 +176,7 @@ class ChartRender(Component):
                 texture.set_alpha(line.alpha)
                 sc.blit(texture, center_coord(center, texture.size))
 
-            for note in self.get_visible_notes(line):
+            for note in line.notes:
                 self.render_note(sc, note, line)
 
             #sc.blit(text(str(i), 20, (255, 255, 255)), center)

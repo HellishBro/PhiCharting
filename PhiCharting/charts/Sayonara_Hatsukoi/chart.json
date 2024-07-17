@@ -1,0 +1,52 @@
+{
+    "BPM": [
+        [
+            178.0,
+            0
+        ]
+    ],
+    "meta": {
+        "defaultSpeed": 12.0
+    },
+    "lines": [
+        {
+            "name": "Unnamed 0",
+            "texture": "line.png",
+            "events": [
+                {
+                    "property": 4,
+                    "easing": 0,
+                    "start": 12.0,
+                    "end": 12.0,
+                    "start_time": 0,
+                    "end_time": 0.33707865168539325
+                },
+                {
+                    "property": 2,
+                    "easing": 0,
+                    "start": 0,
+                    "end": 255,
+                    "start_time": 0,
+                    "end_time": 0.33707865168539325
+                }
+            ],
+            "parent": -1,
+            "notes": []
+        },
+        {
+            "name": "Unnamed 1",
+            "texture": "line.png",
+            "events": [{
+                    "property": 4,
+                    "easing": 0,
+                    "start": 12.0,
+                    "end": 12.0,
+                    "start_time": 0,
+                    "end_time": 0.33707865168539325
+                }
+            ],
+            "parent": -1,
+            "notes": []
+        }
+    ]
+}

@@ -1,10 +1,10 @@
-from .layers import Event, EventLayer, ExtendedEvents
+from .event import Event, Property
 from .line import Line
-from .note import Note, Tap, Drag, Flick, Hold
+from .note import Note, NoteType
 from .easing import EASE, Easing
 
 class BPMTiming:
-    def __init__(self, time: tuple, bpm: float):
+    def __init__(self, time: float, bpm: float):
         self.time = time
         self.bpm = bpm
 
@@ -21,44 +21,31 @@ class Chart:
 
     def to_json(self, **meta):
         d = {
-            "BPMList": [{"bpm": timing.bpm, "startTime": timing.time} for timing in self.bpm_list],
-            "META": {
-                "program": "PhiCharting",
-                "offset": 0
-            },
-            "judgeLineList": [line.to_json() for line in self.lines]
+            "BPM": [[bpm.bpm, bpm.time] for bpm in self.bpm_list],
+            "meta": {},
+            "lines": [line.to_json() for line in self.lines]
         }
         for k, v in meta.items():
-            d["META"][k] = v
+            d["meta"][k] = v
 
         return d
 
     @classmethod
     def from_json(cls, json):
         return cls(
-            [BPMTiming(timing["startTime"], timing["bpm"]) for timing in json["BPMList"]],
-            [Line.from_json(line) for line in json["judgeLineList"]]
+            [BPMTiming(timing[1], timing[0]) for timing in json["BPM"]],
+            [Line.from_json(line) for line in json["lines"]]
         )
 
 if __name__ == "__main__":
     import json
-    chart = Chart([BPMTiming((0, 0, 1), 178)], [
+    chart = Chart([BPMTiming(0, 200)], [
         Line([
-            Tap(-100, (2, 0, 1)),
-            Tap(-75, (2, 0, 1), True),
-            Tap(0, (4, 0, 1)),
-            Tap(-25, (4, 0, 1), True),
-            Tap(25, (4, 0, 1), True),
-            Tap(100, (6, 0, 1)),
-            Tap(75, (6, 0, 1), True)
-        ], events=[
-            EventLayer([], [
-                Event(1, 0, -250, (0, 0, 1), (4, 0, 1))
-            ], [
-                Event(1, 0, 255, (0, 0, 1), (4, 0, 1))
-            ], [], [
-                Event(1, 10, 10, (0, 0, 1), (1, 0, 1))
-            ])
+            Note(NoteType.TAP, 0, 3),
+            Note(NoteType.DRAG, 10, 3.1)
+        ], "Line 0", events=[
+            Event(Property.ALPHA, EASE[0], 0, 255, 0, 2),
+            Event(Property.Y, EASE[3], 0, -300, 1, 2)
         ])
     ])
     print(chart)

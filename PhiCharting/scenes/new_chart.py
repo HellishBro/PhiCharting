@@ -131,21 +131,18 @@ class NewChart(Scene):
                 "composer": self.composer.value,
                 "charter": self.charter.value,
                 "illustrator": self.thumbnail_artist.value,
-                "ratio": [16, 9]
             }, indent=4))
 
         shutil.copy2(self.audio_track.file_path, directory / song_path)
         shutil.copy2(self.thumbnail.file_path, directory / thumbnail_path)
 
         lines = [phi.Line([], f"Unnamed {i}", events=[
-            phi.EventLayer([], [],
-                           [phi.Event(1, 0, 255, (0, 0, 1), (1, 0, 1))]
-                           if i == 0 else [], [], [])
-        ]) for i in range(int(self.line_amount.value))]
+            phi.Event(phi.Property.SPEED, 0, float(self.default_speed.value), float(self.default_speed.value), 0, 60 / float(self.default_bpm.value))
+        ] + ([phi.Event(phi.Property.ALPHA, 0, 0, 255, 0, 60 / float(self.default_bpm.value))] if i == 0 else [])) for i in range(int(self.line_amount.value))]
 
         with open(directory / "chart.json", "w") as f:
-            f.write(json.dumps(phi.Chart([phi.BPMTiming((0, 0, 1), float(self.default_bpm.value))], lines).to_json(
-                defaultSpeed=float(self.default_bpm.value)
+            f.write(json.dumps(phi.Chart([phi.BPMTiming(0, float(self.default_bpm.value))], lines).to_json(
+                defaultSpeed=float(self.default_speed.value)
             ), indent=4))
 
         messagebox.showinfo("Chart Creation Done!", f"Chart files for {self.chart_name.value} is now created!")

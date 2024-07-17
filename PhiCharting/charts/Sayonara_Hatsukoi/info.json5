@@ -1,0 +1,10 @@
+{
+    name: "Sayonara Hatsukoi",
+    chart: "chart.json",
+    song: "song.mp3",
+    thumbnail: "thumbnail.png",
+    level: "IN Lv.15",
+    composer: "REDSHiFT",
+    charter: "HellishBro",
+    illustrator: "REDSHiFT",
+}
